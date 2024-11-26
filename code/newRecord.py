@@ -49,10 +49,8 @@ class LEDRecord:
         self.initListeners()
 
     def initStrips(self):
-        #strip2GPIO = [10, 18, 19, 21]
-        #strip2Channel = [0, 0, 1, 0]
-        strip2GPIO = [18, 18, 19, 21]
-        strip2Channel = [0, 0, 1, 0]
+        strip2GPIO = [18, 19, 21, 10]    # RPi Zero pins
+        strip2Channel = [0, 1, 0, 0]     # ch0 uses pin 18, ch1 uses pin 19, ch2 and ch3 not used
         for strip in range(self.stripCount):
             self.strips[strip] = PixelStrip(self.ledCounts[strip],  # PIXEL COUNT
                                         strip2GPIO[strip],          # DOUT PIN (10 for SPI)
