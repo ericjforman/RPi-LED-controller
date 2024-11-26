@@ -31,7 +31,7 @@ try:
             time.sleep(DEBOUNCE_TIME)
             print("Recording...")
             saveName = datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + "_save"
-            recorder = LEDRecord([289])
+            recorder = LEDRecord([100])    # number of LED pixels on channel 0
             recorder.record(saveName, './saves/')
             while True:
                 recorder.refreshStrips()
