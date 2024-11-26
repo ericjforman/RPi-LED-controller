@@ -22,8 +22,8 @@ class LEDPlayback:
         self.initStrips()
         self.openFiles(filePath)
     def initStrips(self):
-        strip2GPIO = [18, 18, 19, 21]
-        strip2Channel = [0, 0, 1, 0]
+        strip2GPIO = [18, 19, 21, 10]
+        strip2Channel = [0, 1, 0, 0]
         for strip in range(self.stripCount):
             self.strips[strip] = PixelStrip(self.ledCounts[strip],  # PIXEL COUNT
                                         strip2GPIO[strip],          # DOUT PIN (10 for SPI)
