@@ -56,6 +56,7 @@ class LEDRecord:
                                         strip2GPIO[strip],          # DOUT PIN (10 for SPI)
                                         800000,                     # DOUT FREQUENCY (800khz is standard)
                                         10,                         # DMA CHANNEL (10 is a safe bet)
+                                                                    # NOTE: need diff DMA channel for addt'l outputs?
                                         False,                      # DOUT POLARITY (True to invert signal)
                                         255,                        # LED BRIGHTNESS
                                         strip2Channel[strip])       # LED CHANNEL
