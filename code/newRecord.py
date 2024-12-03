@@ -5,7 +5,7 @@ import math
 from rpi_ws281x import PixelStrip, Color
 from stupidArtnet import StupidArtnetServer
 
-# one DMX universe = 512 channels = 170 RGB pixels max
+# one DMX universe = 512 channels = 170 RGB pixels max (last 2 channels unused)
 # initialize up to 4 LED outputs/strips of up to 680 pixels each (4 universes each)
 
 class LEDRecord:
@@ -50,7 +50,7 @@ class LEDRecord:
 
     def initStrips(self):
         strip2GPIO = [18, 19, 21, 10]    # RPi Zero pins
-        strip2Channel = [0, 1, 0, 0]     # ch0 uses pin 18, ch1 uses pin 19, ch2 and ch3 not used
+        strip2Channel = [0, 1, 0, 0]     # ch0 uses pin 18, ch1 uses pin 19, ch2 and ch3 not used (# NOTE: this should be called strip2Output to avoid confusion)
         for strip in range(self.stripCount):
             self.strips[strip] = PixelStrip(self.ledCounts[strip],  # PIXEL COUNT
                                         strip2GPIO[strip],          # DOUT PIN (10 for SPI)
@@ -122,13 +122,13 @@ class LEDRecord:
         del self.artnetServer
 
 if __name__ == "__main__":
-    recorder = LEDRecord([289])
+    recorder = LEDRecord([10])
     recorder.record("liveTest3")
 
     try:
         while True:
             recorder.refreshStrips()
-            time.sleep(0.1)
+            time.sleep(0.1)     # show slower updates to make sure record doesn't miss any data
     except (KeyboardInterrupt, SystemExit):
         recorder.deinit()
         sys.exit()

@@ -23,7 +23,7 @@ class LEDPlayback:
         self.openFiles(filePath)
     def initStrips(self):
         strip2GPIO = [18, 19, 21, 10]
-        strip2Channel = [0, 1, 0, 0]
+        strip2Channel = [0, 1, 0, 0]  # NOTE: this should be called strip2Output to avoid confusion with DMX channels
         for strip in range(self.stripCount):
             self.strips[strip] = PixelStrip(self.ledCounts[strip],  # PIXEL COUNT
                                         strip2GPIO[strip],          # DOUT PIN (10 for SPI)
@@ -31,7 +31,7 @@ class LEDPlayback:
                                         10,                         # DMA CHANNEL (10 is a safe bet)
                                         False,                      # DOUT POLARITY (True to invert signal)
                                         255,                        # LED BRIGHTNESS
-                                        strip2Channel[strip])       # LED CHANNEL
+                                        strip2Channel[strip])       # LED OUTPUT
             self.strips[strip].begin()
     def openFiles(self, path:str):
         for universe in range(self.universeCount):

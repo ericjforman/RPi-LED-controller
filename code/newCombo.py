@@ -7,10 +7,11 @@ from newRecord import LEDRecord
 DEBOUNCE_TIME = 0.5
 GPIO_RECORD = 17
 GPIO_PLAY = 27
+# NOTE: use global variable for # of LEDs? Or read from text config file?
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(GPIO_RECORD, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(GPIO_PLAY, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(GPIO_PLAY,   GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 mode = "Idle"
 
@@ -31,7 +32,7 @@ try:
             time.sleep(DEBOUNCE_TIME)
             print("Recording...")
             saveName = datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + "_save"
-            recorder = LEDRecord([100])    # number of LED pixels on channel 0
+            recorder = LEDRecord([10])    # number of LED pixels on output 0
             recorder.record(saveName, './saves/')
             while True:
                 recorder.refreshStrips()
