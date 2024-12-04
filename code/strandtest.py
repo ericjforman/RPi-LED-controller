@@ -29,18 +29,6 @@ def colorWipe(strip, color, wait_ms=50):
         time.sleep(wait_ms / 1000.0)
 
 
-def theaterChase(strip, color, wait_ms=50, iterations=10):
-    """Movie theater light style chaser animation."""
-    for j in range(iterations):
-        for q in range(3):
-            for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i + q, color)
-            strip.show()
-            time.sleep(wait_ms / 1000.0)
-            for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i + q, 0)
-
-
 def wheel(pos):
     """Generate rainbow colors across 0-255 positions."""
     if pos < 85:
@@ -69,26 +57,18 @@ def rainbowCycle(strip, wait_ms=20, iterations=5):
             strip.setPixelColor(i, wheel(
                 (int(i * 256 / strip.numPixels()) + j) & 255))
         strip.show()
-        time.sleep(wait_ms / 1000.0)
+        time.sleep(wait_ms / 2000.0)
 
-
-def theaterChaseRainbow(strip, wait_ms=50):
-    """Rainbow movie theater light style chaser animation."""
-    for j in range(256):
-        for q in range(3):
-            for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i + q, wheel((i + j) % 255))
-            strip.show()
-            time.sleep(wait_ms / 1000.0)
-            for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i + q, 0)
+def clear():
+    """Clear all pixles."""
+    colorWipe(strip, Color(0, 0, 0), 10)
 
 
 # Main program logic follows:
 if __name__ == '__main__':
     # Process arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--clear', action='store_true', help='clear the display on exit')
+    parser.add_argument('-n', '--noclear', action='store_true', help='do not clear the display on exit')
     args = parser.parse_args()
 
     # Create NeoPixel object with appropriate configuration.
@@ -97,25 +77,22 @@ if __name__ == '__main__':
     strip.begin()
 
     print('Press Ctrl-C to quit.')
-    if not args.clear:
-        print('Use "-c" argument to clear LEDs on exit')
+    if not args.noclear:
+        print('Use "-n" argument to NOT clear LEDs on exit')
 
     try:
 
         while True:
-            print('Color wipe animations.')
+            print('Color Wipes...')
             colorWipe(strip, Color(255, 0, 0))  # Red wipe
             colorWipe(strip, Color(0, 255, 0))  # Green wipe
             colorWipe(strip, Color(0, 0, 255))  # Blue wipe
-            print('Theater chase animations.')
-            theaterChase(strip, Color(127, 127, 127))  # White theater chase
-            theaterChase(strip, Color(127, 0, 0))  # Red theater chase
-            theaterChase(strip, Color(0, 0, 127))  # Blue theater chase
-            print('Rainbow animations.')
+            print('Rainbow...')
             rainbow(strip)
+            print('Rainbow Cycle...')
             rainbowCycle(strip)
-            theaterChaseRainbow(strip)
+            clear()
 
     except KeyboardInterrupt:
-        if args.clear:
-            colorWipe(strip, Color(0, 0, 0), 10)
+        if not args.noclear:
+            clear()
