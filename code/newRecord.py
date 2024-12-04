@@ -16,7 +16,7 @@ class LEDRecord:
             ledCounts = ledCounts[:4]
         for i, count in enumerate(ledCounts):
             if count > 680:
-                print(f"LEDs per strip unable to be more than 680! LED count for strip {i} clipped to 680.")
+                print(f"Maximum of 680 LEDs per strip! LED count for strip {i} clipped to 680.")
                 ledCounts[i] = 680
         if (recTriggerVal > 255 or recTriggerVal < 0):
             print(f"Record trigger value of {recTriggerVal} is invalid. Setting record trigger to default of 255.")
@@ -48,6 +48,7 @@ class LEDRecord:
         self.initStrips()
         self.initListeners()
 
+
     def initStrips(self):
         strip2GPIO = [18, 19, 21, 10]    # RPi Zero pins
         strip2Channel = [0, 1, 0, 0]     # ch0 uses pin 18, ch1 uses pin 19, ch2 and ch3 not used (# NOTE: this should be called strip2Output to avoid confusion)
@@ -59,18 +60,21 @@ class LEDRecord:
                                                                     # NOTE: need diff DMA channel for addt'l outputs?
                                         False,                      # DOUT POLARITY (True to invert signal)
                                         255,                        # LED BRIGHTNESS
-                                        strip2Channel[strip])       # LED CHANNEL
+                                        strip2Channel[strip])       # LED OUTPUT
             self.strips[strip].begin()
+
     def initListeners(self):
         for i in range(self.universeCount):
             self.universeListeners[i] = self.artnetServer.register_listener(i, callback_function = lambda x, i=i:self.recordCallback(x, i))
+            
     def refreshStrips(self):
         for strip in self.strips:
             strip.show()
 
+
     def recordCallback(self, data, universe:int):
         if not self.recording: return
-        if universe == 0 and data[511] == self.recTriggerVal: 
+        if universe == 0 and data[511] == self.recTriggerVal:       # DMX Channels numbered 1-512, but data is 0-511
             if not self.postStartFlag: 
                 print("Got trigger! Toggled recording start...")
                 self.startTime = time.time()
@@ -90,6 +94,7 @@ class LEDRecord:
             stripIndex = 170*self.universe2substrip[universe] + ledCount
             self.strips[self.universe2strip[universe]].setPixelColor(stripIndex, Color(pixR, pixG, pixB))
         self.recordFiles[universe].write(f'\n')
+
     def record(self, saveName:str, saveDir:str = "./"):
         try:
             os.mkdir(f"{saveDir}/{saveName}/")
@@ -109,6 +114,7 @@ class LEDRecord:
         print("Enabled recording, waiting for trigger in universe 1 on channel 512...")
         self.startTime = time.time()
         self.recording = True
+
     def stopRecord(self):
         self.recording = False
         self.postStartFlag = False
@@ -117,10 +123,12 @@ class LEDRecord:
                 self.recordFiles[i].close()
             except:
                 print("No open files to close!")
+
     def deinit(self):
         self.stopRecord()
         time.sleep(0.2)
         del self.artnetServer
+
 
 if __name__ == "__main__":
     recorder = LEDRecord([10])
