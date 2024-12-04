@@ -4,6 +4,10 @@ sftp-config.json
 # VS CODE?:
 # ...
 
+# local OS files
+# Mac:
+.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
