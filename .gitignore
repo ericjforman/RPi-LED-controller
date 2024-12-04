@@ -1,3 +1,9 @@
+# local IDE config files
+# Sublime:
+sftp-config.json
+# VS CODE?:
+# ...
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
