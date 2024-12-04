@@ -59,8 +59,9 @@ def rainbowCycle(strip, wait_ms=20, iterations=5):
         strip.show()
         time.sleep(wait_ms / 2000.0)
 
+
 def clear():
-    """Clear all pixles."""
+    """Clear all pixels."""
     colorWipe(strip, Color(0, 0, 0), 10)
 
 

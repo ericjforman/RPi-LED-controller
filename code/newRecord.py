@@ -133,7 +133,3 @@ if __name__ == "__main__":
     except (KeyboardInterrupt, SystemExit):
         recorder.deinit()
         sys.exit()
-
-#FOR LATER!
-#Make sure to hook a signal handler for SIGKILL to do cleanup. From the handler make sure to call ws2811_fini(). 
-#It'll make sure that the DMA is finished before program execution stops and cleans up after itself.
