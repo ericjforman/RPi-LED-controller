@@ -18,15 +18,18 @@ class LEDRecord:
             if count > 680:
                 print(f"Maximum of 680 LEDs per strip! LED count for strip {i} clipped to 680.")
                 ledCounts[i] = 680
+        print(f"Record trigger (channel 512): {recTriggerVal}")
         if (recTriggerVal > 255 or recTriggerVal < 0):
-            print(f"Record trigger value of {recTriggerVal} is invalid. Setting record trigger to default of 255.")
-            recTriggerVal = 255
+            print(f"Record trigger value of {recTriggerVal} is invalid. Setting to default of 0.")
+            recTriggerVal = 0
+
         # Init data members
         self.ledCounts = ledCounts
         self.stripCount = len(ledCounts)
         self.strips = [None] * self.stripCount
         self.universe2strip = []
         self.universe2substrip = []
+
         # Allocate universes to strips
         for i, count in enumerate(self.ledCounts):
             if count < 170:
@@ -50,7 +53,7 @@ class LEDRecord:
 
 
     def initStrips(self):
-        strip2GPIO = [18, 19, 21, 10]    # RPi Zero pins
+        strip2GPIO = [18, 19, 21, 10]    # RPi Zero pins (NOTE: channel2GPIO would be a clearer name)
         strip2Channel = [0, 1, 0, 0]     # ch0 uses pin 18, ch1 uses pin 19, ch2 and ch3 not used (# NOTE: this should be called strip2Output to avoid confusion)
         for strip in range(self.stripCount):
             self.strips[strip] = PixelStrip(self.ledCounts[strip],  # PIXEL COUNT
@@ -95,7 +98,7 @@ class LEDRecord:
             self.strips[self.universe2strip[universe]].setPixelColor(stripIndex, Color(pixR, pixG, pixB))
         self.recordFiles[universe].write(f'\n')
 
-    def record(self, saveName:str, saveDir:str = "./"):
+    def record(self, saveName:str, saveDir:str = "./saves/"):
         try:
             os.mkdir(f"{saveDir}/{saveName}/")
         except:
@@ -111,7 +114,7 @@ class LEDRecord:
         metadataFile.write(f"{', '.join(str(strip) for strip in self.universe2strip)} #UNIVERSE 2 STRIP\n")
         metadataFile.write(f"{', '.join(str(substrip) for substrip in self.universe2substrip)} #UNIVERSE 2 SUBSTRIP\n")
         metadataFile.close()
-        print("Enabled recording, waiting for trigger in universe 1 on channel 512...")
+        print("Enabled recording, waiting for trigger in universe 0, channel 512...")
         self.startTime = time.time()
         self.recording = True
 
@@ -128,11 +131,12 @@ class LEDRecord:
         self.stopRecord()
         time.sleep(0.2)
         del self.artnetServer
+        # TO DO: clear all LEDs
 
 
 if __name__ == "__main__":
-    recorder = LEDRecord([10])
-    recorder.record("liveTest3")
+    recorder = LEDRecord([20])
+    recorder.record("liveTest")
 
     try:
         while True:
@@ -141,3 +145,8 @@ if __name__ == "__main__":
     except (KeyboardInterrupt, SystemExit):
         recorder.deinit()
         sys.exit()
+
+
+#FOR LATER!
+#Make sure to hook a signal handler for SIGKILL to do cleanup. From the handler make sure to call ws2811_fini(). 
+#It'll make sure that the DMA is finished before program execution stops and cleans up after itself.

@@ -6,6 +6,7 @@ import pyaudio
 audioPath = sys.argv[1]
 startTime = float(sys.argv[2])
 
+# TO DO: add error handling if file not found
 audioFile = wave.open(audioPath, 'rb')
 audioSampleRate = audioFile.getframerate()
 

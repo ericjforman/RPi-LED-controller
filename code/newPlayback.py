@@ -6,6 +6,7 @@ from rpi_ws281x import PixelStrip, Color
 
 class LEDPlayback:
     def __init__(self, filePath:str):
+        print(f"Playing back {filePath}...")
         metadataFile = open(filePath + "/metadata.txt")
         self.universeCount = int(metadataFile.readline().split("#")[0].strip())
         self.stripCount = int(metadataFile.readline().split("#")[0].strip())
@@ -21,6 +22,7 @@ class LEDPlayback:
         self.audioPlaybackProcess = None
         self.initStrips()
         self.openFiles(filePath)
+
     def initStrips(self):
         strip2GPIO = [18, 19, 21, 10]
         strip2Channel = [0, 1, 0, 0]  # NOTE: this should be called strip2Output to avoid confusion with DMX channels
@@ -33,9 +35,11 @@ class LEDPlayback:
                                         255,                        # LED BRIGHTNESS
                                         strip2Channel[strip])       # LED OUTPUT
             self.strips[strip].begin()
+
     def openFiles(self, path:str):
         for universe in range(self.universeCount):
             self.playbackFiles[universe] = open(f"{path}/U{universe}.txt")
+
     def parseLine(self, universe:int):
         rawLine = self.playbackFiles[universe].readline()
         if rawLine == '': return False
@@ -44,6 +48,7 @@ class LEDPlayback:
         for i in range(1, len(cleanLine)):
             frameData.append(int(cleanLine[i]))
         return frameData
+
     def playCallback(self, universe:int):
         if self.finished: return
         frameData = self.parseLine(universe)
@@ -66,30 +71,36 @@ class LEDPlayback:
         timeWait = frameTimeStamp - (time.time() - self.startTime)
         if timeWait < 0: timeWait = 0
         threading.Timer(timeWait, lambda: self.playCallback(universe)).start()
+
     def refreshStrips(self):
         for strip in self.strips:
             strip.show()
+
     def play(self):
         self.finished = False
         self.playbackDones = 0
         # TODO make this based on file path
-        audioPlaybackArgs = ['/home/pi/audio/TestPattern2Audio.wav', str(self.startTime)]
-        self.audioPlaybackProcess = subprocess.Popen(['./venv/bin/python3', './playbackAudio.py'] + audioPlaybackArgs)
+        audioPlaybackArgs = ['/home/pi/audio/TestAudio.wav', str(self.startTime)]
+        self.audioPlaybackProcess = subprocess.Popen(['./venv/bin/python3', './code/playbackAudio.py'] + audioPlaybackArgs)
         self.startTime = time.time()
         for universe in range(self.universeCount):
             self.playbackFiles[universe].seek(0)
             self.playCallback(universe)
+
     def stop(self):
         self.finished = True
         self.audioPlaybackProcess.terminate()
+
     def deinit(self):
         self.stop()
         time.sleep(0.2)
         for universe in range(self.universeCount):
             self.playbackFiles[universe].close()
+        # TO DO: clear all LEDs
+
 
 if __name__ == "__main__":
-    playback = LEDPlayback("./liveTest2")
+    playback = LEDPlayback("./saves/liveTest")
     playback.play()
 
     try:
