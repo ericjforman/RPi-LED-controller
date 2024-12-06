@@ -1,3 +1,5 @@
+# CUSTOM:
+
 # local IDE config files
 # Sublime:
 sftp-config.json
@@ -7,6 +9,12 @@ sftp-config.json
 # local OS files
 # Mac:
 .DS_Store
+
+# audio files
+audio/
+
+
+# BELOW IS THE DEFAULT:
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
