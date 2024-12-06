@@ -4,6 +4,7 @@ import time
 import math
 from rpi_ws281x import PixelStrip, Color
 from stupidArtnet import StupidArtnetServer
+# from newPlayback import clear  # this doesn't work because clear is inside class LEDPlayback
 
 # one DMX universe = 512 channels = 170 RGB pixels max (last 2 channels unused)
 # initialize up to 4 LED outputs/strips of up to 680 pixels each (4 universes each)
@@ -127,11 +128,21 @@ class LEDRecord:
             except:
                 print("No open files to close!")
 
+    def clear(self):                # TO DO: make this function work for all files
+        for universe in range(self.universeCount):
+            for ledCount in range(170):
+                if ledCount > self.ledCounts[self.universe2strip[universe]]: break
+                dataIndex = (ledCount*3)+1
+                pixColor = Color(0,0,0)
+                stripIndex = 170*self.universe2substrip[universe] + ledCount
+                self.strips[self.universe2strip[universe]].setPixelColor(stripIndex, pixColor)
+        self.refreshStrips()
+
     def deinit(self):
         self.stopRecord()
         time.sleep(0.2)
         del self.artnetServer
-        # TO DO: clear all LEDs
+        self.clear()
 
 
 if __name__ == "__main__":

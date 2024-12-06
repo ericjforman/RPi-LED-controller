@@ -6,7 +6,7 @@ from rpi_ws281x import PixelStrip, Color
 
 class LEDPlayback:
     def __init__(self, filePath:str):
-        print(f"Playing back {filePath}...")
+        print(f"Playing back LED data: {filePath}...")
         metadataFile = open(filePath + "/metadata.txt")
         self.universeCount = int(metadataFile.readline().split("#")[0].strip())
         self.stripCount = int(metadataFile.readline().split("#")[0].strip())
@@ -25,7 +25,7 @@ class LEDPlayback:
 
     def initStrips(self):
         strip2GPIO = [18, 19, 21, 10]
-        strip2Channel = [0, 1, 0, 0]  # NOTE: this should be called strip2Output to avoid confusion with DMX channels
+        strip2Channel = [0, 1, 0, 0]  # NOTE: this should be called stripOutputs to avoid confusion with DMX channels
         for strip in range(self.stripCount):
             self.strips[strip] = PixelStrip(self.ledCounts[strip],  # PIXEL COUNT
                                         strip2GPIO[strip],          # DOUT PIN (10 for SPI)
@@ -91,12 +91,23 @@ class LEDPlayback:
         self.finished = True
         self.audioPlaybackProcess.terminate()
 
+    def clear(self):
+        for universe in range(self.universeCount):
+            for ledCount in range(170):
+                if ledCount > self.ledCounts[self.universe2strip[universe]]: break
+                dataIndex = (ledCount*3)+1
+                pixColor = Color(0,0,0)
+                stripIndex = 170*self.universe2substrip[universe] + ledCount
+                self.strips[self.universe2strip[universe]].setPixelColor(stripIndex, pixColor)
+        self.refreshStrips()
+
+
     def deinit(self):
         self.stop()
         time.sleep(0.2)
         for universe in range(self.universeCount):
             self.playbackFiles[universe].close()
-        # TO DO: clear all LEDs
+        self.clear()
 
 
 if __name__ == "__main__":
@@ -107,7 +118,7 @@ if __name__ == "__main__":
         while True:
             playback.refreshStrips()
             if (playback.finished):
-                playback.play()
+                playback.play()                 # loop
     except (KeyboardInterrupt, SystemExit):
         playback.deinit()
         sys.exit()

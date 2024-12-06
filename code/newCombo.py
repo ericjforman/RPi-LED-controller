@@ -19,7 +19,7 @@ try:
     while True:
         if mode == "Idle":
             time.sleep(DEBOUNCE_TIME)
-            print("Idle...")
+            print("Waiting for button press...")
             while True:
                 if not GPIO.input(GPIO_RECORD): 
                     # if necessary? if (GPIO.input(GPIO_RECORD) == 0):
@@ -44,7 +44,7 @@ try:
                     break
         elif mode == "Playback":
             time.sleep(DEBOUNCE_TIME)
-            print("Playing...")
+            print("Playback...")
             folders = glob.glob("./saves/*_save/")
             if folders:
                 newestFolder = max(folders, key=os.path.getctime)
