@@ -19,7 +19,7 @@ try:
     while True:
         if mode == "Idle":
             time.sleep(DEBOUNCE_TIME)
-            print("Waiting for button press...")
+            print("LED Controller idle\nWaiting for button press...")
             while True:
                 if not GPIO.input(GPIO_RECORD): 
                     # if necessary? if (GPIO.input(GPIO_RECORD) == 0):
@@ -48,6 +48,7 @@ try:
             folders = glob.glob("./saves/*_save/")
             if folders:
                 newestFolder = max(folders, key=os.path.getctime)
+            #TO DO: error check if newestFolder doesn't exist
             playback = LEDPlayback(newestFolder)
             playback.play()
             while True:

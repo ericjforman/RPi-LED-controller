@@ -6,7 +6,7 @@ from rpi_ws281x import PixelStrip, Color
 
 class LEDPlayback:
     def __init__(self, filePath:str):
-        print(f"Playing back LED data: {filePath}...")
+        print(f"  Playing back LED data: {filePath}...")
         metadataFile = open(filePath + "/metadata.txt")
         self.universeCount = int(metadataFile.readline().split("#")[0].strip())
         self.stripCount = int(metadataFile.readline().split("#")[0].strip())
@@ -91,7 +91,7 @@ class LEDPlayback:
         self.finished = True
         self.audioPlaybackProcess.terminate()
 
-    def clear(self):
+    def clear(self):                # TO DO: make this function work for all files
         for universe in range(self.universeCount):
             for ledCount in range(170):
                 if ledCount > self.ledCounts[self.universe2strip[universe]]: break

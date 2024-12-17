@@ -10,7 +10,7 @@ from rpi_ws281x import PixelStrip, Color
 import argparse
 
 # LED strip configuration:
-LED_COUNT = 16        # Number of LED pixels.
+LED_COUNT = 20        # Number of LED pixels.
 LED_PIN = 18          # GPIO pin connected to the pixels (18 uses PWM!).
 # LED_PIN = 10        # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
 LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -62,7 +62,7 @@ def rainbowCycle(strip, wait_ms=20, iterations=5):
 
 def clear():
     """Clear all pixels."""
-    colorWipe(strip, Color(0, 0, 0), 10)
+    colorWipe(strip, Color(0, 0, 0), 0)
 
 
 # Main program logic follows:

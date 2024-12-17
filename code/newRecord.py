@@ -10,18 +10,18 @@ from stupidArtnet import StupidArtnetServer
 # initialize up to 4 LED outputs/strips of up to 680 pixels each (4 universes each)
 
 class LEDRecord:
-    def __init__(self, ledCounts:int = [120], recTriggerVal:int = 0):
+    def __init__(self, ledCounts:int = [20], recTriggerVal:int = 0):
         # Input parameter sanity checks
         if len(ledCounts) > 4:
-            print("Unable to init more than 4 strips! Initing first 4 strips only.")
+            print("  Unable to init more than 4 strips! Initing first 4 strips only.")
             ledCounts = ledCounts[:4]
         for i, count in enumerate(ledCounts):
             if count > 680:
-                print(f"Maximum of 680 LEDs per strip! LED count for strip {i} clipped to 680.")
+                print(f"  Maximum of 680 LEDs per strip! LED count for strip {i} clipped to 680.")
                 ledCounts[i] = 680
-        print(f"Record trigger (channel 512): {recTriggerVal}")
+        print(f"  Record trigger (channel 512): {recTriggerVal}")
         if (recTriggerVal > 255 or recTriggerVal < 0):
-            print(f"Record trigger value of {recTriggerVal} is invalid. Setting to default of 0.")
+            print(f"  Record trigger value of {recTriggerVal} is invalid. Setting to default of 0.")
             recTriggerVal = 0
 
         # Init data members
@@ -80,12 +80,12 @@ class LEDRecord:
         if not self.recording: return
         if universe == 0 and data[511] == self.recTriggerVal:       # DMX Channels numbered 1-512, but data is 0-511
             if not self.postStartFlag: 
-                print("Got trigger! Toggled recording start...")
+                print("  Got trigger! Toggled recording start...")
                 self.startTime = time.time()
             self.postStartFlag = True
         if universe == 0 and data[511] != self.recTriggerVal:
             if self.postStartFlag: 
-                print("Got trigger! Toggled recording end...")
+                print("  Got trigger! Toggled recording end...")
                 self.recording = False
             self.postStartFlag = False
         if not self.postStartFlag: return
@@ -103,7 +103,7 @@ class LEDRecord:
         try:
             os.mkdir(f"{saveDir}/{saveName}/")
         except:
-            print(f"Save file with name {saveName} in {saveDir} already exists! Aborting...")
+            print(f"  Save file with name {saveName} in {saveDir} already exists! Aborting...")
             return
         for universe in range(self.universeCount):
             dir = f"{saveDir}/{saveName}/"
@@ -115,7 +115,7 @@ class LEDRecord:
         metadataFile.write(f"{', '.join(str(strip) for strip in self.universe2strip)} #UNIVERSE 2 STRIP\n")
         metadataFile.write(f"{', '.join(str(substrip) for substrip in self.universe2substrip)} #UNIVERSE 2 SUBSTRIP\n")
         metadataFile.close()
-        print("Enabled recording, waiting for trigger in universe 0, channel 512...")
+        print("  Enabled recording, waiting for trigger in universe 0, channel 512...")
         self.startTime = time.time()
         self.recording = True
 
@@ -126,7 +126,7 @@ class LEDRecord:
             try:
                 self.recordFiles[i].close()
             except:
-                print("No open files to close!")
+                print("  No open files to close!")
 
     def clear(self):                # TO DO: make this function work for all files
         for universe in range(self.universeCount):
