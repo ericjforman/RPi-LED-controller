@@ -79,10 +79,11 @@ class LEDPlayback:
     def play(self):
         self.finished = False
         self.playbackDones = 0
+        self.startTime = time.time()
         # TODO make this based on file path
         audioPlaybackArgs = ['/home/pi/audio/TestAudio.wav', str(self.startTime)]
         self.audioPlaybackProcess = subprocess.Popen(['./venv/bin/python3', './code/playbackAudio.py'] + audioPlaybackArgs)
-        self.startTime = time.time()
+        #self.startTime = time.time()
         for universe in range(self.universeCount):
             self.playbackFiles[universe].seek(0)
             self.playCallback(universe)

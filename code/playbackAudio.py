@@ -10,7 +10,10 @@ def audioCallback(in_data, frame_count, time_info, status):
     data = audioFile.readframes(frame_count)
     return (data, pyaudio.paContinue)
 
-print(f"Playing back audio: {audioPath}...")
+
+print(f"  Playing back audio: {audioPath}...")
+
+# TO DO: audio start is cut off - playback starts about 0.25 seconds into the file, how could that much time elapse?
 
 try:
     with wave.open(audioPath, 'rb') as file:
@@ -25,10 +28,13 @@ try:
                         stream_callback=audioCallback)
         while stream.is_active():
             timeElapsed = time.time()-startTime
+#           print(f"  {time.time()} - {startTime} = ")
+            print(f"  {timeElapsed} * {audioSampleRate} = {int(timeElapsed*audioSampleRate)}")
             audioFile.setpos(int(timeElapsed*audioSampleRate))
             time.sleep(10)
         stream.close()
         p.terminate()
+
 except FileNotFoundError:
     print(f"Audio file {audioPath} not found!")
 except PermissionError:
@@ -38,6 +44,8 @@ except Exception as e:
 
 
 """
+# previous code, without error handling:
+
 audioFile = wave.open(audioPath, 'rb')
 audioSampleRate = audioFile.getframerate()
 
