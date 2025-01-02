@@ -8,11 +8,11 @@ class LEDPlayback:
     def __init__(self, filePath:str):
         print(f"  Playing back LED data: {filePath}...")
         metadataFile = open(filePath + "/metadata.txt")
-        self.universeCount = int(metadataFile.readline().split("#")[0].strip())
-        self.stripCount = int(metadataFile.readline().split("#")[0].strip())
-        self.ledCounts = [int(x) for x in metadataFile.readline().split("#")[0].strip().split(", ")]
-        self.universe2strip = [int(x) for x in metadataFile.readline().split("#")[0].strip().split(", ")]
-        self.universe2substrip = [int(x) for x in metadataFile.readline().split("#")[0].strip().split(", ")]
+        self.universeCount =        int(metadataFile.readline().split("#")[0].strip())
+        self.stripCount =           int(metadataFile.readline().split("#")[0].strip())
+        self.ledCounts =            [int(x) for x in metadataFile.readline().split("#")[0].strip().split(", ")]
+        self.universe2strip =       [int(x) for x in metadataFile.readline().split("#")[0].strip().split(", ")]
+        self.universe2substrip =    [int(x) for x in metadataFile.readline().split("#")[0].strip().split(", ")]
         self.strips = [None] * self.stripCount
         self.playbackFiles = [None] * self.universeCount
         self.playbackFrame = [0] * self.universeCount
@@ -50,16 +50,18 @@ class LEDPlayback:
         return frameData
 
     def playCallback(self, universe:int):
+#        print("  playCallback start")
         if self.finished: return
         frameData = self.parseLine(universe)
         if frameData == False:
             self.playbackDones += 1
             if self.playbackDones == self.universeCount:
+                print("  no frame data, terminating audio.")
                 self.audioPlaybackProcess.terminate()
                 self.finished = True
             return
         for ledCount in range(170):
-            if ledCount > self.ledCounts[self.universe2strip[universe]]: break
+            if ledCount >= self.ledCounts[self.universe2strip[universe]]: break
             dataIndex = (ledCount*3)+1
             pixColor = Color(frameData[dataIndex], 
                              frameData[dataIndex+1], 
@@ -67,10 +69,15 @@ class LEDPlayback:
             stripIndex = 170*self.universe2substrip[universe] + ledCount
             self.strips[self.universe2strip[universe]].setPixelColor(stripIndex, pixColor)
         self.playbackFrame[universe]+=1
+        # NOTE: this always calls back twice before audio is started, something not quite right
+        # NOTE: is this why audio playback skips tiny bit at start? 
         frameTimeStamp = frameData[0]
+#        print(f"  {time.time()} - {self.startTime} = ")
         timeWait = frameTimeStamp - (time.time() - self.startTime)
+#        print(f"  timeWait: {timeWait}")
         if timeWait < 0: timeWait = 0
         threading.Timer(timeWait, lambda: self.playCallback(universe)).start()
+ #       print("  playCallback done")
 
     def refreshStrips(self):
         for strip in self.strips:
@@ -79,14 +86,17 @@ class LEDPlayback:
     def play(self):
         self.finished = False
         self.playbackDones = 0
-        self.startTime = time.time()        # used to be AFTER audioPlaybackProcess, doublecheck which is better...
-        # TODO make this based on file path
-        audioPlaybackArgs = ['/home/pi/audio/TestAudio.wav', str(self.startTime)]
+        self.startTime = time.time()        # used to be AFTER audioPlaybackProcess, doublecheck this doesn't cause other issues...
+        # TODO: make file name based on LED data save, or based on argument in metadata.txt
+        audioPlaybackArgs = ['./audio/TestAudio.wav', str(self.startTime)]
+        # TODO: make path work for any venv name
         self.audioPlaybackProcess = subprocess.Popen(['./venv/bin/python3', './code/playbackAudio.py'] + audioPlaybackArgs)
-        #self.startTime = time.time()       # moved above
+        #self.startTime = time.time()       # moved above, because otherwise startTime is 0 for playbackAudio, which throws errors when syncing
         for universe in range(self.universeCount):
             self.playbackFiles[universe].seek(0)
+ #           print("before playCallback")
             self.playCallback(universe)
+ #           print("after playCallback")
 
     def stop(self):
         self.finished = True
@@ -119,7 +129,7 @@ if __name__ == "__main__":
         while True:
             playback.refreshStrips()
             if (playback.finished):
-                print("looping...")
+                print("test looping...")
                 playback.play()                 # loop
     except (KeyboardInterrupt, SystemExit):
         playback.deinit()

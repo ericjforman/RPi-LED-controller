@@ -85,13 +85,13 @@ class LEDRecord:
             self.postStartFlag = True
         if universe == 0 and data[511] != self.recTriggerVal:
             if self.postStartFlag: 
-                print("  Got trigger! Toggled recording end...")
+                print("  Trigger removed! Toggled recording end...")
                 self.recording = False
             self.postStartFlag = False
         if not self.postStartFlag: return
-        self.recordFiles[universe].write(f'{time.time()-self.startTime} ')
+        self.recordFiles[universe].write(f'{time.time()-self.startTime} ')      # frame time stamp
         for ledCount in range(170):
-            if ledCount > self.ledCounts[self.universe2strip[universe]]: break
+            if ledCount >= self.ledCounts[self.universe2strip[universe]]: break      # make sure this writes all pixels, i.e. should be > ledCounts
             dataIndex = ledCount*3
             pixR, pixG, pixB = data[dataIndex], data[dataIndex+1], data[dataIndex+2]
             self.recordFiles[universe].write(f'{pixR} {pixG} {pixB} ')

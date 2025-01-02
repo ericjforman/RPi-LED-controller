@@ -7,10 +7,11 @@ audioPath = sys.argv[1]
 startTime = float(sys.argv[2])
 
 
-print(f"  Playing back audio: {audioPath}...")
+print(f"  Playing back audio: {audioPath}")
 
 # TO DO: audio start is cut off - playback starts about 0.25 seconds into the file, how could that much time elapse?
 #   (maybe it is the lengthy ALSA and jack error output...)
+#   (maybe is is playCallback running twice before playbackAudio runs...)
 
 try:
     with wave.open(audioPath, 'rb') as file:
@@ -32,11 +33,11 @@ try:
                         output=True,
                         stream_callback=audioCallback)
 
-        # Wait for stream to finish
+        # Sync audio every 10 seconds
         while stream.is_active():
             timeElapsed = time.time()-startTime
-#           print(f"  {time.time()} - {startTime} = ")
-            print(f"  {timeElapsed} * {audioSampleRate} = {int(timeElapsed*audioSampleRate)}")
+            print(f"  {time.time()} - {startTime} = ")
+            print(f"  timeElapsed: {timeElapsed} = pos. {int(timeElapsed*audioSampleRate)}")
             audioFile.setpos(int(timeElapsed*audioSampleRate))
             time.sleep(10)
 
