@@ -79,11 +79,11 @@ class LEDPlayback:
     def play(self):
         self.finished = False
         self.playbackDones = 0
-        self.startTime = time.time()
+        self.startTime = time.time()        # used to be AFTER audioPlaybackProcess, doublecheck which is better...
         # TODO make this based on file path
         audioPlaybackArgs = ['/home/pi/audio/TestAudio.wav', str(self.startTime)]
         self.audioPlaybackProcess = subprocess.Popen(['./venv/bin/python3', './code/playbackAudio.py'] + audioPlaybackArgs)
-        #self.startTime = time.time()
+        #self.startTime = time.time()       # moved above
         for universe in range(self.universeCount):
             self.playbackFiles[universe].seek(0)
             self.playCallback(universe)
@@ -92,7 +92,7 @@ class LEDPlayback:
         self.finished = True
         self.audioPlaybackProcess.terminate()
 
-    def clear(self):                # TO DO: make this function work for all files
+    def clear(self):                        # TO DO: make this function work for all files
         for universe in range(self.universeCount):
             for ledCount in range(170):
                 if ledCount > self.ledCounts[self.universe2strip[universe]]: break
@@ -119,6 +119,7 @@ if __name__ == "__main__":
         while True:
             playback.refreshStrips()
             if (playback.finished):
+                print("looping...")
                 playback.play()                 # loop
     except (KeyboardInterrupt, SystemExit):
         playback.deinit()
