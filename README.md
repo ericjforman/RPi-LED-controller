@@ -1,5 +1,7 @@
 # RPi-LED-controller
-Raspberry Pi Zero 2 LED Controller with synchronized audio output
+Raspberry Pi Zero 2 LED Controller with built-in LED recording, true synchronized audio output, and seamless looping.
+
+WARNING: IN DEVELOPMENT, NOT FULLY WORKING YET!
 
 Eric Forman Studio [https://www.ericforman.com]
 
